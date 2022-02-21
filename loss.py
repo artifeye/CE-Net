@@ -107,7 +107,8 @@ class DiceLoss(nn.Module):
         super(DiceLoss, self).__init__()
 
     def forward(self, input, target):
-        N, H, W = target.size(0), target.size(2), target.size(3)
+        #N, H, W = target.size(0), target.size(2), target.size(3)
+        N = target.size(0)
         smooth = 1
 
         input_flat = input.view(N, -1)
@@ -140,7 +141,6 @@ class MulticlassDiceLoss(nn.Module):
 
         dice = DiceLoss()
         totalLoss = 0
-
         for i in range(C):
             diceLoss = dice(input[:, i, :, :], target[:, i,:, :])
             if weights is not None:
