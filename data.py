@@ -150,7 +150,7 @@ def default_DRIVE_loader(img_path, mask_path):
     img, mask = randomVerticleFlip(img, mask)
     img, mask = randomRotate90(img, mask)
 
-    mask = np.expand_dims(mask, axis=2)
+    #mask = np.expand_dims(mask, axis=2)
     img = np.array(img, np.float32).transpose(2, 0, 1) / 255.0 * 3.2 - 1.6
     mask = np.array(mask, np.float32).transpose(2, 0, 1) / 255.0
     mask[mask >= 0.5] = 1
@@ -244,6 +244,27 @@ def read_DRIVE_datasets(root_path, mode='train'):
     return images, masks
 
 
+def read_kesit_datasets(root_path, mode='train'):
+    images = []
+    masks = []
+
+    image_root = os.path.join(root_path, 'training/images')
+    gt_root = os.path.join(root_path, 'training/1st_manual')
+
+
+    for image_name in os.listdir(image_root):
+        image_path = os.path.join(image_root, image_name)
+        label_path = os.path.join(gt_root, image_name)
+
+        images.append(image_path)
+        masks.append(label_path)
+
+    print(images, masks)
+
+    return images, masks
+
+
+
 def read_Cell_datasets(root_path, mode='train'):
     images = []
     masks = []
@@ -293,8 +314,8 @@ class ImageFolder(data.Dataset):
         self.root = root_path
         self.mode = mode
         self.dataset = datasets
-        assert self.dataset in ['RIM-ONE', 'Messidor', 'ORIGA', 'DRIVE', 'Cell', 'Vessel'], \
-            "the dataset should be in 'Messidor', 'ORIGA', 'RIM-ONE', 'Vessel' "
+        assert self.dataset in ['RIM-ONE', 'Messidor', 'ORIGA', 'DRIVE', 'Cell', 'Vessel', 'kesit'], \
+            "the dataset should be in 'Messidor', 'ORIGA', 'RIM-ONE', 'Vessel' , 'kesit'"
         if self.dataset == 'RIM-ONE':
             self.images, self.labels = read_RIM_ONE_datasets(self.root, self.mode)
         elif self.dataset == 'Messidor':
@@ -303,6 +324,8 @@ class ImageFolder(data.Dataset):
             self.images, self.labels = read_ORIGA_datasets(self.root, self.mode)
         elif self.dataset == 'DRIVE':
             self.images, self.labels = read_DRIVE_datasets(self.root, self.mode)
+        elif self.dataset == 'kesit':
+            self.images, self.labels = read_kesit_datasets(self.root, self.mode)
         elif self.dataset == 'Cell':
             self.images, self.labels = read_Cell_datasets(self.root, self.mode)
         elif self.dataset == 'GAN_Vessel':
