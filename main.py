@@ -13,15 +13,12 @@ from torch.autograd import Variable as V
 
 from networks.cenet import CE_Net_
 from framework import MyFrame
-from loss import dice_bce_loss
+from loss import dice_bce_loss, MulticlassDiceLoss
 from data import ImageFolder
 from Visualizer import Visualizer
 
 import Constants
 import image_utils
-
-# Please specify the ID of graphics cards that you want to use
-os.environ['CUDA_VISIBLE_DEVICES'] = "8"
 
 
 def CE_Net_Train():
@@ -30,13 +27,13 @@ def CE_Net_Train():
     # run the Visdom
     viz = Visualizer(env=NAME)
 
-    solver = MyFrame(CE_Net_, dice_bce_loss, 2e-4)
-    batchsize = torch.cuda.device_count() * Constants.BATCHSIZE_PER_CARD
+    solver = MyFrame(CE_Net_, MulticlassDiceLoss, 2e-4)
+    batchsize = 1 * Constants.BATCHSIZE_PER_CARD
 
     # For different 2D medical image segmentation tasks, please specify the dataset which you use
     # for examples: you could specify "dataset = 'DRIVE' " for retinal vessel detection.
 
-    dataset = ImageFolder(root_path=Constants.ROOT, datasets='DRIVE')
+    dataset = ImageFolder(root_path=Constants.ROOT, datasets='kesit')
     data_loader = torch.utils.data.DataLoader(
         dataset,
         batch_size=batchsize,
@@ -100,8 +97,7 @@ def CE_Net_Train():
 
 
 if __name__ == '__main__':
-    print(torch.__version__())
+    print(torch.__version__)
     CE_Net_Train()
-
 
 
